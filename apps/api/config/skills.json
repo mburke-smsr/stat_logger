@@ -1,0 +1,15 @@
+{
+  "default_stale_days": 120,
+  "categories": {
+    "Rope/Tech": [
+      { "name": "Anchors" },
+      { "name": "Haul Systems", "stale_after_days": 90 }
+    ],
+    "Medical": [
+      { "name": "Patient Packaging", "stale_after_days": 60 }
+    ],
+    "Comms": [
+      { "name": "Radio Ops", "stale_after_days": 90 }
+    ]
+  }
+}
