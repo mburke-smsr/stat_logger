@@ -42,8 +42,10 @@ def dev_login(payload: DevLoginRequest, response: Response, db: Session = Depend
         key=COOKIE_NAME,
         value=token,
         httponly=True,
-        secure=bool(settings.cookie_secure),
-        samesite="lax",
+        #secure=bool(settings.cookie_secure),
+        #samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=60 * 60 * 24 * 7,
         path="/",
     )

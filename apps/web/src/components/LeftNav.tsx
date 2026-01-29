@@ -10,23 +10,34 @@ type Props = {
   isAdmin?: boolean;
 };
 
-export default function LeftNav({ skillsByCategory, active, onNavigate, isAdmin }: Props) {
-  function navItem(label: string, key: NavKey, right?: React.ReactNode, disabled?: boolean) {
-    const cls = key === active ? "navItem navItemActive" : "navItem";
+export default function LeftNav({
+  skillsByCategory,
+  active,
+  onNavigate,
+  isAdmin = false,
+}: Props) {
+  function NavButton({
+    label,
+    navKey,
+    right,
+  }: {
+    label: string;
+    navKey: NavKey;
+    right?: React.ReactNode;
+  }) {
+    const isActive = navKey === active;
+    const cls = isActive ? "navItem navItemActive" : "navItem";
+
     return (
-      <a
-        href="#"
+      <button
+        type="button"
         className={cls}
-        onClick={(e) => {
-          e.preventDefault();
-          if (disabled) return;
-          onNavigate(key);
-        }}
-        style={disabled ? { opacity: 0.55, cursor: "not-allowed" } : undefined}
+        onClick={() => onNavigate(navKey)}
+        aria-current={isActive ? "page" : undefined}
       >
         <span style={{ fontWeight: 650 }}>{label}</span>
         {right}
-      </a>
+      </button>
     );
   }
 
@@ -34,10 +45,12 @@ export default function LeftNav({ skillsByCategory, active, onNavigate, isAdmin 
     <div className="card">
       <div className="nav">
         <div className="navGroupTitle">Workspace</div>
-        {navItem("New Log", "new-log")}
-        {navItem("Recent Logs", "recent-logs")}
-        {navItem("Reports", "reports")}
-        {isAdmin ? navItem("Admin", "admin") : navItem("Admin", "admin", <span className="pill">Admin</span>, true)}
+
+        <NavButton label="New Log" navKey="new-log" />
+        <NavButton label="Recent Logs" navKey="recent-logs" />
+        <NavButton label="Reports" navKey="reports" />
+
+        {isAdmin ? <NavButton label="Admin" navKey="admin" /> : null}
 
         <hr className="hr" />
 
@@ -45,7 +58,11 @@ export default function LeftNav({ skillsByCategory, active, onNavigate, isAdmin 
 
         <div style={{ display: "grid", gap: 6 }}>
           {skillsByCategory.map(([cat, skills]) => (
-            <div key={cat} className="navItem" style={{ cursor: "default" }}>
+            <div
+              key={cat}
+              className="navSkillRow"
+              title={`${skills.length} skills`}
+            >
               <span style={{ fontSize: 13 }}>{cat}</span>
               <span className="pill">{skills.length}</span>
             </div>

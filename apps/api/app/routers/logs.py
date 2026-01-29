@@ -163,6 +163,72 @@ def create_meeting_log(
 
     return _log_out(entry, [], sorted(list(participant_ids)))
 
+
+
+@router.get("/recent", response_model=list[LogOut])
+def list_recent_logs(
+    limit: int = 500,
+    db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
+) -> list[LogOut]:
+    limit = max(1, min(limit, 2000))
+
+    # Permission hook (for later):
+    can_view_all = True  # later: user.permission_level == "admin"
+
+    q = db.query(LogEntry).order_by(LogEntry.starts_at.desc())
+    if not can_view_all:
+        q = q.filter(LogEntry.owner_id == user.id)
+
+    entries = q.limit(limit).all()
+    entry_ids = [e.id for e in entries]
+
+    # Skills
+    skill_map: dict[int, list[int]] = {}
+    if entry_ids:
+        rows = (
+            db.query(LogEntrySkill.entry_id, LogEntrySkill.skill_id)
+            .filter(LogEntrySkill.entry_id.in_(entry_ids))
+            .all()
+        )
+        for eid, sid in rows:
+            skill_map.setdefault(eid, []).append(sid)
+
+    # Participants
+    part_map: dict[int, list[int]] = {}
+    if entry_ids:
+        rows = (
+            db.query(LogEntryParticipant.entry_id, LogEntryParticipant.user_id)
+            .filter(LogEntryParticipant.entry_id.in_(entry_ids))
+            .all()
+        )
+        for eid, uid in rows:
+            part_map.setdefault(eid, []).append(uid)
+
+    out: list[LogOut] = []
+    for e in entries:
+        out.append(
+            LogOut(
+                id=e.id,
+                kind=e.kind,
+                training_type=e.training_type,
+                meeting_type=e.meeting_type,
+                title=e.title,
+                meeting_category=e.meeting_category,
+                event_id=e.event_id,
+                owner_id=e.owner_id,
+                starts_at=e.starts_at,
+                duration_minutes=e.duration_minutes,
+                notes=e.notes or "",
+                created_at=e.created_at,
+                skill_ids=sorted(list(dict.fromkeys(skill_map.get(e.id, [])))),
+                participant_user_ids=sorted(list(dict.fromkeys(part_map.get(e.id, [e.owner_id])))),
+            )
+        )
+    return out
+
+
+
 @router.get("/mine", response_model=list[LogOut])
 def list_my_logs(
     db: Session = Depends(get_db),

@@ -15,6 +15,7 @@ type Props = {
   right?: React.ReactNode;
 };
 
+
 export default function AppShell({
   me,
   onLogout,
@@ -25,20 +26,24 @@ export default function AppShell({
   right,
 }: Props) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const isAdmin = me.permission_level === "admin";
 
   const nav = useMemo(
     () => (
       <LeftNav
         skillsByCategory={skillsByCategory}
         active={activeNav}
+        isAdmin={isAdmin}
         onNavigate={(k) => {
-            onNavigate?.(k);
-            setMobileNavOpen(false);
+          // hard safety: ignore admin nav for non-admins
+          if (k === "admin" && !isAdmin) return;
+
+          onNavigate?.(k);
+          setMobileNavOpen(false); // close drawer on mobile
         }}
-        isAdmin={me.permission_level === "admin"}
       />
     ),
-    [skillsByCategory, activeNav, onNavigate, me.permission_level]
+    [skillsByCategory, activeNav, onNavigate, isAdmin]
   );
 
   return (

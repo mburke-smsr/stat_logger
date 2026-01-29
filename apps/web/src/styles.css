@@ -380,3 +380,189 @@ button, input, select, textarea { font-family: var(--font); }
 .loginBody { padding: 0 18px 18px; }
 .loginTitle { font-size: 18px; font-weight: 720; letter-spacing: 0.2px; }
 .loginSub { color: var(--muted); margin-top: 6px; font-size: 13px; line-height: 1.4; }
+
+
+
+/* Ensure selects are readable in dark mode */
+select.input {
+  color: var(--text);
+  background-color: var(--bg-elevated);
+}
+
+/* Dropdown options */
+select.input option {
+  color: #111;              /* readable text */
+  background-color: #fff;   /* native dropdown background */
+}
+
+/* Optional: hover / selected */
+select.input option:checked {
+  background-color: #e5e7eb;
+}
+/* --- Responsive shell layout --- */
+.shell {
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr) 360px;
+  gap: 14px;
+  padding: 14px;
+}
+
+.mainRail {
+  display: grid;
+  gap: 14px;
+}
+
+/* Mobile: collapse to single column, hide desktop rails */
+@media (max-width: 980px) {
+  .shell {
+    grid-template-columns: 1fr;
+    padding-bottom: 86px; /* make room for bottom nav */
+  }
+
+  .leftRail {
+    display: none;
+  }
+
+  .rightRail {
+    display: none;
+  }
+
+  .mobileRight {
+    display: block;
+  }
+
+  .desktopRight {
+    display: none;
+  }
+}
+
+/* Desktop: show right rail, hide stacked right */
+@media (min-width: 981px) {
+  .mobileRight {
+    display: none;
+  }
+
+  .desktopRight {
+    display: block;
+  }
+
+  .mobileBottomNav {
+    display: none;
+  }
+}
+
+/* --- Mobile bottom nav --- */
+.mobileBottomNav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 50;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 10px;
+  border-top: 1px solid var(--border);
+  background: rgba(10, 12, 18, 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.mobileTab {
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.03);
+  color: var(--text);
+  font-weight: 750;
+}
+
+.mobileTabActive {
+  background: rgba(255,255,255,0.09);
+  border-color: rgba(255,255,255,0.18);
+}
+
+
+
+.noticeBar {
+  position: sticky;
+  top: 56px; /* adjust if your TopBar height differs */
+  z-index: 60;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  margin: 10px 14px 0 14px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+}
+
+.toastError {
+  position: fixed;
+  right: 14px;
+  bottom: 96px; /* stays above mobile bottom nav */
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(560px, calc(100vw - 28px));
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 120, 120, 0.35);
+  border-radius: 16px;
+  background: rgba(80, 20, 20, 0.55);
+  backdrop-filter: blur(10px);
+}
+
+.toastSmall {
+  position: fixed;
+  right: 14px;
+  bottom: 96px;
+  z-index: 80;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+  font-weight: 800;
+}
+
+.btnPrimary {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.12);
+  color: var(--text);
+  font-weight: 850;
+}
+/* LeftNav: skills rows should look informational, not clickable */
+.navSkillRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+}
+
+/* Make nav buttons behave like your old <a> */
+.navItem {
+  width: 100%;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}

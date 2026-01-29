@@ -1,7 +1,16 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+const API_BASE =
+  (import.meta as any).env?.VITE_API_BASE_URL?.replace(/\/$/, "") || "http://localhost:8000";
+
+function emitApiError(message: string, status?: number) {
+  window.dispatchEvent(
+    new CustomEvent("app:apiError", {
+      detail: { message, status },
+    })
+  );
+}
 
 export async function apiFetch(path: string, init: RequestInit = {}) {
-  const res = await fetch(`http://localhost:8000${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     credentials: "include",
     headers: {
       "Content-Type": "application/json",
@@ -10,20 +19,29 @@ export async function apiFetch(path: string, init: RequestInit = {}) {
     ...init,
   });
 
-  // 204/205 = no content, don’t try to parse JSON
-  if (res.status === 204 || res.status === 205) {
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-    return null;
-  }
+  // 204/205 no content: ok -> null
+  if ((res.status === 204 || res.status === 205) && res.ok) return null;
 
-  // Some endpoints may return empty body with 200/201 too; handle that
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  const data = text ? safeJson(text) : null;
 
   if (!res.ok) {
-    // keep existing error behavior
-    throw new Error(text || `${res.status} ${res.statusText}`);
+    const msg =
+      (data && (data.detail || data.message)) ||
+      text ||
+      `${res.status} ${res.statusText}`;
+
+    emitApiError(typeof msg === "string" ? msg : JSON.stringify(msg), res.status);
+    throw new Error(typeof msg === "string" ? msg : JSON.stringify(msg));
   }
 
   return data;
+}
+
+function safeJson(text: string) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
 }
