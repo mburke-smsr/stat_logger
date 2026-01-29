@@ -11,15 +11,22 @@ from app.db.session import SessionLocal
 
 app = FastAPI(title="SMSR Training Log API", version="0.3.0")
 
-# CORS (frontend dev)
+# CORS (cookie auth requires explicit origins — no "*")
 origins = [o.strip() for o in settings.cors_origins.split(",") if o.strip()]
+
+default_origins = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins or ["http://localhost:5173"],
+    allow_origins=(origins or default_origins),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 @app.on_event("startup")
 def on_startup() -> None:
